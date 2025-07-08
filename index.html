@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 복지상담 시뮬레이터</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      background-color: #eef2f7;
+      margin: 0;
+    }
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background-color: #007bff;
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1.25rem;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    main {
+      flex: 1;
+      padding: 2rem;
+    }
+    .step {
+      display: none;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .step.active {
+      display: block;
+    }
+    .card {
+      background-color: #f5f9ff;
+      border-left: 4px solid #007bff;
+      padding: 1rem 1.5rem;
+      margin: 1rem 0;
+      border-radius: 6px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+    .question {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .options input {
+      margin-right: 0.5rem;
+    }
+    textarea, select, input[type="text"] {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      display: inline-block;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+    button:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    .lang-select {
+      position: absolute;
+      top: 1rem;
+      right: 2rem;
+    }
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.8);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .spinner {
+      border: 6px solid #ccc;
+      border-top: 6px solid #007bff;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header>AI 기반 복지상담 시뮬레이터</header>
+    <div class="lang-select">
+      <label for="langSelect">Language:</label>
+      <select id="langSelect" onchange="switchLanguage(this.value)">
+        <option value="ko">한국어</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+    <div id="loadingOverlay"><div class="spinner"></div></div>
+    <main>
+      <div id="step1" class="step active">
+        <h1>상담 대상자 정보</h1>
+        <p style="color:#666">가상의 사례를 통해 복지 연계 시뮬레이션을 진행합니다</p>
+        <div class="card">
+          <strong>상담대상자 정보:</strong><br>
+          이름: 홍길동<br>
+          생년월일: 1965.01.01<br>
+          주소: 서울시 성북구 정릉로 100<br>
+          건강보험료: 없음 (체납)<br>
+          가구형태: 1인 가구<br>
+          위기사유: 실직 및 건강악화<br>
+          상담자: 김상담 (성북구청 복지팀)
+        </div>
+        <button onclick="showStep('step2')">상담 시작하기</button>
+      </div>
+      <div id="step2" class="step">
+        <div id="infoBanner" style="display:none; background:#e0f3ff; padding:1rem; border-radius:5px; color:#004085; margin-bottom:1rem; text-align:center; font-weight:bold;">
+          AI 추천 화면으로 이동합니다.
+        </div>
+        <h1>STEP 2: 전자 설문 입력</h1>
+        <form id="surveyForm">
+          <!-- 질문 항목은 기존 구성과 동일하게 유지됨 -->
+          <button type="button" disabled id="nextBtn">AI 추천 보기</button>
+        </form>
+      </div>
+      <div id="step3" class="step">
+        <h1>STEP 3: AI 추천 복지서비스</h1>
+        <p style="color:#444; margin-top:-1rem; margin-bottom:1rem;">※ 아래 내용은 전자설문 응답 기반으로 AI가 분석한 결과입니다.</p>
+        <div class="card">
+          <strong>긴급복지지원 (생계비)</strong>
+          <ul>
+            <li>자격요건: 중위소득 75% 이하 + 위기사유</li>
+            <li>지원: 월 473,000원</li>
+            <li>서류: 등본, 소득자료, 입증서류</li>
+            <li>기관: 성북구 ○○동 주민센터</li>
+          </ul>
+          <label><input type="checkbox"> 이 서비스 연계 요청</label>
+        </div>
+        <div class="card">
+          <strong>방문건강관리서비스</strong>
+          <ul>
+            <li>자격요건: 65세 이상 + 만성질환</li>
+            <li>지원: 간호사 방문, 복약지도</li>
+            <li>기관: 성북구보건소</li>
+          </ul>
+          <label><input type="checkbox"> 이 서비스 연계 요청</label>
+        </div>
+        <div class="card">
+          <strong>식료품 지원 (푸드뱅크)</strong>
+          <ul>
+            <li>자격요건: 무소득 1인 독거</li>
+            <li>지원: 식료품 월 1회</li>
+            <li>기관: 성북구 사회복지관</li>
+          </ul>
+          <label><input type="checkbox"> 이 서비스 연계 요청</label>
+        </div>
+        <label>상담사 비고</label>
+        <textarea placeholder="상담자가 참고할 내용 또는 특이사항"></textarea>
+        <button onclick="showStep('step4')">연계조치 진행</button>
+      </div>
+      <div id="step4" class="step">
+        <h1>STEP 4: 상담사 연계조치</h1>
+        <div class="card">
+          <strong>선택된 서비스 요약:</strong>
+          <ul>
+            <li>긴급복지지원 - 성북구 ○○동 주민센터</li>
+            <li>방문건강관리 - 성북구보건소</li>
+            <li>식료품 지원 - 성북구 사회복지관</li>
+          </ul>
+        </div>
+        <label>연계기관 선택</label>
+        <select>
+          <option>성북구 ○○동 주민센터</option>
+          <option>성북구보건소</option>
+          <option>성북구 사회복지관</option>
+          <option>기타 연계기관</option>
+        </select>
+        <label>상담자 의견</label>
+        <textarea placeholder="상담자가 기록할 참고사항"></textarea>
+        <button onclick="generatePDF()">제출 및 저장</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    function switchLanguage(lang) {
+      document.documentElement.setAttribute('data-lang', lang);
+    }
+    function showStep(stepId) {
+      document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+      document.getElementById(stepId).classList.add('active');
+    }
+    const form = document.getElementById('surveyForm');
+    const nextBtn = document.getElementById('nextBtn');
+    form.addEventListener('input', () => {
+      const requiredFields = [
+        form.income?.value,
+        form.crisis?.value,
+        form.housing?.value,
+        form.alone?.value,
+        form.insurance?.value,
+        form.hospital?.value,
+        form.support?.value,
+        form.urgent?.value,
+        form.reason?.value.trim(),
+        form.comment?.value.trim(),
+      ];
+      nextBtn.disabled = !requiredFields.every(val => val && val.length > 0);
+    });
+    nextBtn.onclick = function () {
+      if (!nextBtn.disabled) {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        const banner = document.getElementById('infoBanner');
+        banner.style.display = 'block';
+        setTimeout(() => {
+          showStep('step3');
+          banner.style.display = 'none';
+          document.getElementById('loadingOverlay').style.display = 'none';
+        }, 1500);
+      }
+    };
+    function generatePDF() {
+      const content = document.getElementById('step4').innerHTML;
+      const win = window.open('', '', 'width=800,height=600');
+      win.document.write('<html><head><title>상담 결과</title></head><body>');
+      win.document.write(content);
+      win.document.write('</body></html>');
+      win.document.close();
+      win.print();
+    }
+  </script>
+</body>
+</html>
