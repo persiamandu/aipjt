@@ -150,8 +150,82 @@
         </div>
         <h1>STEP 2: 전자 설문 입력</h1>
         <form id="surveyForm">
-          <!-- 설문 항목은 그대로 유지 -->
-          <button type="button" disabled id="nextBtn">AI 추천 보기</button>
+
+        <div class="question">
+        <label>1. 현재 고정적인 소득이 있으신가요?</label>
+        <div class="options">
+          <input type="radio" name="income" value="없음" required /> 없음
+          <input type="radio" name="income" value="일용직" /> 일용직
+          <input type="radio" name="income" value="정기수입" /> 정기적 수입
+        </div>
+      </div>
+      <div class="question">
+        <label>2. 가장 시급하게 지원이 필요한 영역은 무엇인가요?</label>
+        <div class="options">
+          <input type="radio" name="urgent" value="생계" required /> 생계
+          <input type="radio" name="urgent" value="의료" /> 의료
+          <input type="radio" name="urgent" value="주거" /> 주거
+          <input type="radio" name="urgent" value="돌봄" /> 돌봄
+          <input type="radio" name="urgent" value="기타" /> 기타
+        </div>
+      </div>
+      <div class="question">
+        <label>3. 현재 생활에 어려움을 느끼는 주요 사유는 무엇인가요?</label>
+        <textarea name="reason" placeholder="예: 소득 없음, 주거불안, 건강 악화 등"></textarea>
+      </div>
+      <div class="question">
+        <label>4. 최근 3개월 내 위기상황이 있었나요?</label>
+        <div class="options">
+          <input type="radio" name="crisis" value="실직" required /> 실직
+          <input type="radio" name="crisis" value="가족사망" /> 가족 사망
+          <input type="radio" name="crisis" value="질병" /> 질병
+          <input type="radio" name="crisis" value="없음" /> 없음
+        </div>
+      </div>
+      <div class="question">
+        <label>5. 현재 주거 형태는 어떻게 되시나요?</label>
+        <div class="options">
+          <input type="radio" name="housing" value="자가" required /> 자가
+          <input type="radio" name="housing" value="전세" /> 전세
+          <input type="radio" name="housing" value="월세" /> 월세
+          <input type="radio" name="housing" value="무상" /> 무상거주
+          <input type="radio" name="housing" value="노숙" /> 노숙 또는 거주불안
+        </div>
+      </div>
+      <div class="question">
+        <label>6. 혼자 거주 중이신가요?</label>
+        <div class="options">
+          <input type="radio" name="alone" value="예" required /> 예
+          <input type="radio" name="alone" value="아니오" /> 아니오
+        </div>
+      </div>
+      <div class="question">
+        <label>7. 건강보험료는 정상 납부 중이신가요?</label>
+        <div class="options">
+          <input type="radio" name="insurance" value="정상납부" required /> 정상납부
+          <input type="radio" name="insurance" value="체납" /> 체납
+          <input type="radio" name="insurance" value="미가입" /> 미가입
+        </div>
+      </div>
+      <div class="question">
+        <label>8. 최근 병원 진료를 받은 적이 있으신가요?</label>
+        <div class="options">
+          <input type="radio" name="hospital" value="있음" required /> 있음
+          <input type="radio" name="hospital" value="없음" /> 없음
+        </div>
+      </div>
+      <div class="question">
+        <label>9. 일상생활에 도움이 필요한 부분이 있으신가요?</label>
+        <div class="options">
+          <input type="radio" name="support" value="예" required /> 예
+          <input type="radio" name="support" value="아니오" /> 아니오
+        </div>
+      </div>
+      <div class="question">
+        <label>10. 특별히 전달하고 싶은 상황이나 요청사항이 있으신가요?</label>
+        <textarea name="comment" placeholder="전달하고 싶은 요청사항 또는 특이사항을 작성해 주세요."></textarea>
+      </div>
+      <button type="button" disabled id="nextBtn">AI 추천 보기</button>
         </form>
       </div>
       <div id="step3" class="step">
@@ -221,33 +295,24 @@
       steps.forEach(step => step.classList.remove('active'));
       document.getElementById(stepId).classList.add('active');
     }
-
     const form = document.getElementById('surveyForm');
     const nextBtn = document.getElementById('nextBtn');
-
-    form.querySelectorAll('input, textarea').forEach(el => {
-      el.addEventListener('change', checkFormStatus);
-      el.addEventListener('input', checkFormStatus);
-    });
-
-    function checkFormStatus() {
-      const formData = new FormData(form);
+    form.addEventListener('input', () => {
       const requiredFields = [
-        formData.get('income'),
-        formData.get('crisis'),
-        formData.get('housing'),
-        formData.get('alone'),
-        formData.get('insurance'),
-        formData.get('hospital'),
-        formData.get('support'),
-        formData.get('urgent'),
-        formData.get('reason')?.trim(),
-        formData.get('comment')?.trim(),
+        form.income?.value,
+        form.crisis?.value,
+        form.housing?.value,
+        form.alone?.value,
+        form.insurance?.value,
+        form.hospital?.value,
+        form.support?.value,
+        form.urgent?.value,
+        form.reason?.value.trim(),
+        form.comment?.value.trim(),
       ];
       const isComplete = requiredFields.every(val => val && val.length > 0);
       nextBtn.disabled = !isComplete;
-    }
-
+    });
     nextBtn.onclick = function () {
       if (!nextBtn.disabled) {
         document.getElementById('loadingOverlay').style.display = 'flex';
@@ -260,7 +325,6 @@
         }, 1500);
       }
     };
-
     function generatePDF() {
       const content = document.getElementById('step4').innerHTML;
       const win = window.open('', '', 'width=800,height=600');
