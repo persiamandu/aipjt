@@ -125,7 +125,9 @@
         <option value="en">English</option>
       </select>
     </div>
-    <div id="loadingOverlay"><div class="spinner"></div></div>
+    <div id="loadingOverlay">
+      <div class="spinner"></div>
+    </div>
     <main>
       <div id="step1" class="step active">
         <h1>상담 대상자 정보</h1>
@@ -148,7 +150,7 @@
         </div>
         <h1>STEP 2: 전자 설문 입력</h1>
         <form id="surveyForm">
-          <!-- 질문 항목은 기존 구성과 동일하게 유지됨 -->
+          <!-- 설문 항목은 그대로 유지 -->
           <button type="button" disabled id="nextBtn">AI 추천 보기</button>
         </form>
       </div>
@@ -215,26 +217,37 @@
       document.documentElement.setAttribute('data-lang', lang);
     }
     function showStep(stepId) {
-      document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+      const steps = document.querySelectorAll('.step');
+      steps.forEach(step => step.classList.remove('active'));
       document.getElementById(stepId).classList.add('active');
     }
+
     const form = document.getElementById('surveyForm');
     const nextBtn = document.getElementById('nextBtn');
-    form.addEventListener('input', () => {
-      const requiredFields = [
-        form.income?.value,
-        form.crisis?.value,
-        form.housing?.value,
-        form.alone?.value,
-        form.insurance?.value,
-        form.hospital?.value,
-        form.support?.value,
-        form.urgent?.value,
-        form.reason?.value.trim(),
-        form.comment?.value.trim(),
-      ];
-      nextBtn.disabled = !requiredFields.every(val => val && val.length > 0);
+
+    form.querySelectorAll('input, textarea').forEach(el => {
+      el.addEventListener('change', checkFormStatus);
+      el.addEventListener('input', checkFormStatus);
     });
+
+    function checkFormStatus() {
+      const formData = new FormData(form);
+      const requiredFields = [
+        formData.get('income'),
+        formData.get('crisis'),
+        formData.get('housing'),
+        formData.get('alone'),
+        formData.get('insurance'),
+        formData.get('hospital'),
+        formData.get('support'),
+        formData.get('urgent'),
+        formData.get('reason')?.trim(),
+        formData.get('comment')?.trim(),
+      ];
+      const isComplete = requiredFields.every(val => val && val.length > 0);
+      nextBtn.disabled = !isComplete;
+    }
+
     nextBtn.onclick = function () {
       if (!nextBtn.disabled) {
         document.getElementById('loadingOverlay').style.display = 'flex';
@@ -247,6 +260,7 @@
         }, 1500);
       }
     };
+
     function generatePDF() {
       const content = document.getElementById('step4').innerHTML;
       const win = window.open('', '', 'width=800,height=600');
