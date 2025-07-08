@@ -296,23 +296,31 @@
       document.getElementById(stepId).classList.add('active');
     }
     const form = document.getElementById('surveyForm');
-    const nextBtn = document.getElementById('nextBtn');
-    form.addEventListener('input', () => {
-      const requiredFields = [
-        form.income?.value,
-        form.crisis?.value,
-        form.housing?.value,
-        form.alone?.value,
-        form.insurance?.value,
-        form.hospital?.value,
-        form.support?.value,
-        form.urgent?.value,
-        form.reason?.value.trim(),
-        form.comment?.value.trim(),
-      ];
-      const isComplete = requiredFields.every(val => val && val.length > 0);
-      nextBtn.disabled = !isComplete;
-    });
+const nextBtn = document.getElementById('nextBtn');
+
+form.querySelectorAll('input, textarea').forEach(el => {
+  el.addEventListener('input', checkFormStatus);
+  el.addEventListener('change', checkFormStatus);
+});
+
+function checkFormStatus() {
+  const formData = new FormData(form);
+  const requiredFields = [
+    formData.get('income'),
+    formData.get('crisis'),
+    formData.get('housing'),
+    formData.get('alone'),
+    formData.get('insurance'),
+    formData.get('hospital'),
+    formData.get('support'),
+    formData.get('urgent'),
+    formData.get('reason')?.trim(),
+    formData.get('comment')?.trim()
+  ];
+  const isComplete = requiredFields.every(val => val && val.length > 0);
+  nextBtn.disabled = !isComplete;
+}
+
     nextBtn.onclick = function () {
       if (!nextBtn.disabled) {
         document.getElementById('loadingOverlay').style.display = 'flex';
